@@ -113,15 +113,15 @@ export default function First() {
     NavigationBar.setBehaviorAsync("immersive");
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const nextIndex = (currentCardIndex + 1) % cardData.length;
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-      setCurrentCardIndex(nextIndex);
-    }, 3000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const nextIndex = (currentCardIndex + 1) % cardData.length;
+  //     flatListRef.current?.scrollToIndex({ index: nextIndex, animated: false });
+  //     setCurrentCardIndex(nextIndex);
+  //   }, 3000);
 
-    return () => clearInterval(interval);
-  }, [currentCardIndex]);
+  //   return () => clearInterval(interval);
+  // }, [currentCardIndex]);
 
   return (
     <View style={styles.container}>
@@ -186,7 +186,7 @@ export default function First() {
               />
             </View>
           )}
-        />
+        /> 
       </View>
 
       {/* Breeds Section */}
@@ -199,12 +199,28 @@ export default function First() {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.categoryPage}>
-            {item.map((category) => (
-              <View key={category.id} style={styles.categoryItem}>
-                <Image source={category.image} style={styles.breedimg} />
-                <Text style={styles.categoryLabel}>{category.name}</Text>
-              </View>
-            ))}
+    {item.map((category) => (
+  <View key={category.id} style={styles.categoryItem}>
+    <TouchableOpacity
+      onPress={() => {
+        let route = "";
+
+        if (category.name === "Labrador") route = "/labrodor";
+        else if (category.name === "German Shepherd") route = "/german";
+        else if(category.name ==="Pug") route="/pug";
+
+        router.push({
+          pathname: route,
+          params: { id: category.id, name: category.name },
+        });
+      }}
+    >
+      <Image source={category.image} style={styles.breedimg} />
+    </TouchableOpacity>
+    <Text style={styles.categoryLabel}>{category.name}</Text>
+  </View>
+))}
+
           </View>
         )}
         contentContainerStyle={{ paddingHorizontal: 20 }}
