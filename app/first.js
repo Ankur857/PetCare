@@ -144,25 +144,30 @@ export default function First() {
 
       {/* Profile Menu */}
       {showProfileMenu && (
-        <View style={styles.profileMenu}>
-          <TouchableOpacity style={styles.menuItem}>
-            <AntDesign name="user" size={20} color="#555" style={styles.menuIcon} />
-            <Text style={styles.menuText}>My Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            <Entypo name="back-in-time" size={20} color="#555" style={styles.menuIcon} />
-            <Text style={styles.menuText}>History</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            <Entypo name="documents" size={20} color="#555" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Records</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            <Entypo name="shop" size={20} color="#555" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Shop</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+  <View style={styles.profileMenu}>
+    <TouchableOpacity style={styles.menuItem}>
+      <AntDesign name="user" size={20} color="#555" style={styles.menuIcon} />
+      <Text style={styles.menuText}>My Profile</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/appointmentRecords")}>
+      <Entypo name="calendar" size={20} color="#555" style={styles.menuIcon} />
+      <Text style={styles.menuText}>Appointments</Text>
+    </TouchableOpacity>
+
+
+    <TouchableOpacity style={styles.menuItem}>
+      <Entypo name="cog" size={20} color="#555" style={styles.menuIcon} />
+      <Text style={styles.menuText}>Settings</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.menuItem}>
+      <AntDesign name="logout" size={20} color="#555" style={styles.menuIcon} />
+      <Text style={styles.menuText}>Logout</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
 
       {/* Auto-scrolling cards */}
       <View style={{ height: hp(24) }}>
@@ -271,10 +276,11 @@ export default function First() {
           <Text style={styles.navLabel}>Rescue</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <Entypo name="cog" size={24} color="#fff" />
-          <Text style={styles.navLabel}>Settings</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/appointmentRecords")}>
+  <Ionicons name="document-text-outline" size={24} color="#fff" />
+  <Text style={styles.navLabel}>Records</Text>
+</TouchableOpacity>
+
       </View>
     </View>
   );

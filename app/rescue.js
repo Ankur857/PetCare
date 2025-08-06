@@ -178,10 +178,11 @@ export default function Rescue() {
           <Text style={styles.navLabel}>Rescue</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <Entypo name="cog" size={24} color="#fff" />
-          <Text style={styles.navLabel}>Settings</Text>
-        </TouchableOpacity>
+       <TouchableOpacity onPress={() => router.push("/appointmentRecords")}>
+  <Ionicons name="document-text-outline" size={24} color="#fff" />
+  <Text style={styles.navLabel}>Records</Text>
+</TouchableOpacity>
+
       </View>
     </View>
   );
@@ -302,5 +303,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     marginTop: 4,
+    alignSelf:'center',
   },
 });
