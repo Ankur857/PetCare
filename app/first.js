@@ -6,6 +6,7 @@ import {
   FlatList,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -18,6 +19,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -90,7 +92,7 @@ const categoryPages = chunkArray(categories, 3);
 
 const Card = ({ title, subtitle, image }) => (
   <LinearGradient
-    colors={["#c471f5", "#fa71cd"]}
+    colors={["#6d48ff", "#8e44ad"]}
     start={{ x: 0, y: 0 }}
     end={{ x: 0, y: 1 }}
     style={styles.card}
@@ -107,21 +109,34 @@ export default function First() {
   const flatListRef = useRef(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    NavigationBar.setVisibilityAsync("hidden");
-    NavigationBar.setBehaviorAsync("immersive");
+    const getUser = async () => {
+      const user = await AsyncStorage.getItem('currentUser');
+      if (user) {
+        setCurrentUser(JSON.parse(user));
+      }
+    };
+    getUser();
   }, []);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const nextIndex = (currentCardIndex + 1) % cardData.length;
-  //     flatListRef.current?.scrollToIndex({ index: nextIndex, animated: false });
-  //     setCurrentCardIndex(nextIndex);
-  //   }, 3000);
-
-  //   return () => clearInterval(interval);
-  // }, [currentCardIndex]);
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            await AsyncStorage.removeItem('currentUser');
+            router.replace('/');
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -134,40 +149,41 @@ export default function First() {
           >
             <AntDesign name="user" size={34} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.tx}>Hi</Text>
+          <View style={{ marginLeft: 15 }}>
+            <Text style={styles.welcomeText}>Hello, {currentUser?.name || 'Guest'}!</Text>
+            <Text style={styles.subWelcome}>How can we help today?</Text>
+          </View>
         </View>
 
         <TouchableOpacity style={styles.notifyIcon}>
-          <Ionicons name="notifications-outline" size={34} color="#333" />
+          <Ionicons name="notifications-outline" size={30} color="#333" />
         </TouchableOpacity>
       </View>
 
       {/* Profile Menu */}
       {showProfileMenu && (
-  <View style={styles.profileMenu}>
-    <TouchableOpacity style={styles.menuItem}>
-      <AntDesign name="user" size={20} color="#555" style={styles.menuIcon} />
-      <Text style={styles.menuText}>My Profile</Text>
-    </TouchableOpacity>
+        <View style={styles.profileMenu}>
+          <TouchableOpacity style={styles.menuItem}>
+            <AntDesign name="user" size={20} color="#555" style={styles.menuIcon} />
+            <Text style={styles.menuText}>My Profile</Text>
+          </TouchableOpacity>
 
-    <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/appointmentRecords")}>
-      <Entypo name="calendar" size={20} color="#555" style={styles.menuIcon} />
-      <Text style={styles.menuText}>Appointments</Text>
-    </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/appointmentRecords")}>
+            <Entypo name="calendar" size={20} color="#555" style={styles.menuIcon} />
+            <Text style={styles.menuText}>Appointments</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity style={styles.menuItem}>
+            <Entypo name="cog" size={20} color="#555" style={styles.menuIcon} />
+            <Text style={styles.menuText}>Settings</Text>
+          </TouchableOpacity>
 
-    <TouchableOpacity style={styles.menuItem}>
-      <Entypo name="cog" size={20} color="#555" style={styles.menuIcon} />
-      <Text style={styles.menuText}>Settings</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity style={styles.menuItem}>
-      <AntDesign name="logout" size={20} color="#555" style={styles.menuIcon} />
-      <Text style={styles.menuText}>Logout</Text>
-    </TouchableOpacity>
-  </View>
-)}
-
+          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+            <AntDesign name="logout" size={20} color="#ff6b6b" style={styles.menuIcon} />
+            <Text style={[styles.menuText, { color: "#ff6b6b" }]}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Auto-scrolling cards */}
       <View style={{ height: hp(24) }}>
@@ -191,7 +207,7 @@ export default function First() {
               />
             </View>
           )}
-        /> 
+        />
       </View>
 
       {/* Breeds Section */}
@@ -204,28 +220,25 @@ export default function First() {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.categoryPage}>
-    {item.map((category) => (
-  <View key={category.id} style={styles.categoryItem}>
-    <TouchableOpacity
-      onPress={() => {
-        let route = "";
-
-        if (category.name === "Labrador") route = "/labrodor";
-        else if (category.name === "German Shepherd") route = "/german";
-        else if(category.name ==="Pug") route="/pug";
-
-        router.push({
-          pathname: route,
-          params: { id: category.id, name: category.name },
-        });
-      }}
-    >
-      <Image source={category.image} style={styles.breedimg} />
-    </TouchableOpacity>
-    <Text style={styles.categoryLabel}>{category.name}</Text>
-  </View>
-))}
-
+            {item.map((category) => (
+              <View key={category.id} style={styles.categoryItem}>
+                <TouchableOpacity
+                  onPress={() => {
+                    let route = "";
+                    if (category.name === "Labrador") route = "/labrodor";
+                    else if (category.name === "German Shepherd") route = "/german";
+                    else if (category.name === "Pug") route = "/pug";
+                    router.push({
+                      pathname: route,
+                      params: { id: category.id, name: category.name },
+                    });
+                  }}
+                >
+                  <Image source={category.image} style={styles.breedimg} />
+                </TouchableOpacity>
+                <Text style={styles.categoryLabel}>{category.name}</Text>
+              </View>
+            ))}
           </View>
         )}
         contentContainerStyle={{ paddingHorizontal: 20 }}
@@ -276,11 +289,10 @@ export default function First() {
           <Text style={styles.navLabel}>Rescue</Text>
         </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/appointmentRecords")}>
-  <Ionicons name="document-text-outline" size={24} color="#fff" />
-  <Text style={styles.navLabel}>Records</Text>
-</TouchableOpacity>
-
+        <TouchableOpacity onPress={() => router.push("/appointmentRecords")}>
+          <Ionicons name="document-text-outline" size={24} color="#fff" />
+          <Text style={styles.navLabel}>Records</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -290,7 +302,7 @@ export default function First() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9ff",
     paddingTop: 10,
   },
   header: {
@@ -302,44 +314,55 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   iconBox: {
-    backgroundColor: "skyblue",
+    backgroundColor: "#6d48ff",
     width: 60,
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 15,
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
   },
-  tx: {
-    fontSize: 30,
-    fontWeight: "500",
-    marginLeft: 15,
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  subWelcome: {
+    fontSize: 14,
+    color: "#666",
   },
   notifyIcon: {
     marginRight: 10,
   },
   profileMenu: {
     position: "absolute",
-    top: 110,
+    top: 120,
     left: 20,
-    backgroundColor: "#f0f4ff",
-    borderRadius: 12,
+    backgroundColor: "#fff",
+    borderRadius: 15,
     paddingVertical: 10,
     paddingHorizontal: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 8,
-    zIndex: 10,
-    width: 180,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 20,
+    width: 200,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
   menuIcon: {
-    marginRight: 10,
+    marginRight: 15,
   },
   menuText: {
     fontSize: 15,
@@ -352,9 +375,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 20,
     marginBottom: 20,
-    backgroundColor: "#ccc",
     width: "85%",
     minHeight: hp(2),
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
   textContainer: {
     flex: 1,
@@ -376,11 +403,12 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
   },
   opt: {
-    fontSize: 20,
-    color: "blue",
+    fontSize: 22,
+    color: "#333",
     marginTop: 10,
     marginLeft: 20,
-    marginBottom: 5,
+    marginBottom: 10,
+    fontWeight: "bold",
   },
   categoryPage: {
     width: width - 40,
@@ -393,16 +421,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   breedimg: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
-    marginBottom: 8,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    resizeMode: "cover",
+    marginBottom: 10,
+    borderRadius: 45,
+    borderWidth: 3,
+    borderColor: "#6d48ff",
   },
   categoryLabel: {
     fontSize: 14,
     color: "#333",
     textAlign: "center",
+    fontWeight: "600",
   },
   sectionHeader: {
     flexDirection: "row",
@@ -413,52 +444,65 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "blue",
+    color: "#333",
   },
   doctorCard: {
-    backgroundColor: "#c7eaffff",
+    backgroundColor: "#fff",
     borderRadius: 15,
-    padding: 10,
+    padding: 15,
     alignItems: "center",
     width: 200,
     marginRight: 15,
-    height: 190,
+    height: 200,
     marginBottom: 150,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   doctorImage: {
     width: 100,
     height: 100,
-    borderRadius: 40,
+    borderRadius: 50,
     resizeMode: "contain",
     marginBottom: 10,
+    borderWidth: 3,
+    borderColor: "#6d48ff",
   },
   doctorName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#333",
   },
   doctorSpecialty: {
     fontSize: 12,
     color: "#666",
     textAlign: "center",
-    marginBottom: 4,
+    marginTop: 4,
   },
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "#6d48ff",
-    paddingVertical: 12,
+    paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 25,
     marginHorizontal: 20,
-    marginBottom: 40,
+    marginBottom: 20,
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10,
   },
   navItem: {
     alignItems: "center",
@@ -466,6 +510,7 @@ const styles = StyleSheet.create({
   navLabel: {
     color: "#fff",
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: "500",
   },
 });

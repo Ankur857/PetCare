@@ -1,7 +1,6 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Image, Text, View, StyleSheet, Pressable, Dimensions } from "react-native";
-import LottieView from "lottie-react-native";
-import { useRef, useEffect } from "react";
+import { Dimensions, Image, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 
 export const options = {
   headerShown: false,
@@ -10,91 +9,75 @@ export const options = {
 const { height, width } = Dimensions.get("window");
 
 export default function Index() {
-  const petAnim = useRef(null);
-
-  useEffect(() => {
-    petAnim.current?.play();
-  }, []);
-
   return (
-    <View style={styles.container}>
-      {/* Background Image */}
-      <Image
-        source={require("../assets/images/doc.png")}
-        style={styles.bgImage}
-      />
+    <ImageBackground
+      source={require("../assets/images/vetclinic_02.jpg")}
+      style={styles.background}
+      imageStyle={{ opacity: 0.1 }}
+    >
+      <View style={styles.container}>
+        <Image source={require("../assets/images/image.png")} style={styles.logo} />
+        <Text style={styles.title}>Welcome to PetCare</Text>
+        <Text style={styles.subtitle}>Your trusted partner in pet health and happiness</Text>
 
-      {/* Pet Animation */}
-      <LottieView
-        ref={petAnim}
-        source={require("../assets/animations/pet.json")}
-        style={styles.petAnim}
-        loop
-        autoPlay
-      />
-
-      {/* Text Content */}
-      <View style={styles.tcont}>
-        <Text style={styles.ft}>Welcome to PetCare</Text>
-        <Text style={styles.subText}>Your one-stop solution for pet appointments and care</Text>
+        <LinearGradient
+          colors={["#6d48ff", "#8e44ad"]}
+          style={styles.getStartedBtn}
+        >
+          <Pressable onPress={() => router.push("/login")}>
+            <Text style={styles.getStartedText}>Get Started</Text>
+          </Pressable>
+        </LinearGradient>
       </View>
-
-      {/* Button */}
-      <Pressable style={styles.btn} onPress={() => router.push("first")}>
-        <Text style={styles.btntext}>Get Started</Text>
-      </Pressable>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: "#f0f4ff",
+  },
   container: {
     flex: 1,
-    backgroundColor: "#fefefe",
-  },
-  bgImage: {
-    width: "100%",
-    height: "55%",
-    resizeMode: "cover",
-  },
-  tcont: {
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
   },
-  ft: {
-    color: "#2e86de",
-    fontSize: 28,
+  logo: {
+    width: 180,
+    height: 180,
+    resizeMode: "contain",
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 34,
     fontWeight: "bold",
+    color: "#333",
     textAlign: "center",
+    marginBottom: 15,
   },
-  subText: {
-    fontSize: 16,
-    color: "#444",
-    marginTop: 10,
+  subtitle: {
+    fontSize: 17,
+    color: "#666",
     textAlign: "center",
+    marginBottom: 60,
+    lineHeight: 24,
   },
-  btn: {
-    backgroundColor: "#2e86de",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 90,
-    alignSelf: "center",
-    marginTop: 90,
-    width: "50%",
-    elevation: 3,
+  getStartedBtn: {
+    width: "100%",
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: "center",
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  btntext: {
+  getStartedText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    textAlign: "center",
-  },
-  petAnim: {
-    position: "absolute",
-    bottom: 120,
-    width: 200,
-    height: 200,
-    alignSelf: "center",
   },
 });
