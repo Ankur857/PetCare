@@ -1,50 +1,120 @@
-# Welcome to your Expo app 👋
+# PetCare 🐾
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+PetCare is a modern, full-stack mobile application designed to help pet owners schedule veterinary appointments, submit doctor reviews, and report stray animal rescues (complete with geolocated coordinates and device-captured photos).
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Key Features
+1. **User Accounts & Authentication**: Secure Sign Up and Log In using MongoDB, Mongoose, and JWT tokens.
+2. **Vet Appointment Scheduling**: Choose your pet, select a certified veterinarian, pick date and time slots, and schedule consultations.
+3. **Doctor Reviews & Ratings**: Share ratings (1-5 stars) and comments to review your experiences with veterinary doctors.
+4. **Animal Rescue Reporting**: Report emergency stray animal rescues. Captures a photo using the device camera, auto-detects current location using reverse-geocoding, and uploads the details directly to MongoDB.
 
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React Native & Expo**: Framework for building universal native apps.
+- **Expo Router**: File-based routing for navigation.
+- **Expo Image Picker**: Access camera and gallery to capture rescue pictures.
+- **Expo Location**: Fetch device GPS coordinates and reverse-geocode them to locality names.
+- **AsyncStorage**: Store authentication tokens and user sessions.
+
+### Backend
+- **Node.js & Express**: Fast, lightweight web server.
+- **Mongoose**: MongoDB object modeling (ODM).
+- **JSON Web Tokens (JWT)**: Security token standard for secure authentication API calls.
+- **Bcrypt.js**: Secure hashing of passwords before database storage.
+
+---
+
+## 📂 Project Structure
+
+```text
+├── app/                  # React Native / Expo Frontend Application
+│   ├── _layout.js        # Root entry layout
+│   ├── index.js          # App landing screen (handles auto-login check)
+│   ├── login.js          # User Log In page
+│   ├── signup.js         # User Sign Up page
+│   ├── first.js          # Homepage with category grids & profile menu
+│   ├── appointment.js    # Appointment scheduling calendar
+│   ├── appointmentRecords.js # User appointment history
+│   ├── doctorfeedback.js # Feedback review & rating screen
+│   ├── rescue.js         # Capture photo & submit animal rescue report
+│   ├── config.js         # Centralized API network settings
+│   └── ...               # Dog breed details pages
+│
+├── backend/              # Node.js Express REST API
+│   ├── config/           # Database configuration
+│   ├── controllers/      # Route handler logical controllers
+│   ├── middleware/       # Authentication filters
+│   ├── models/           # Mongoose schemas (User, Appointment, Feedback, Rescue)
+│   ├── routes/           # API router endpoints
+│   ├── server.js         # Backend entry file
+│   └── .env              # Environment config (Port, Database connection string, JWT key)
+```
+
+---
+
+## ⚙️ Setup & Installation
+
+### Prerequisite
+Ensure you have [Node.js](https://nodejs.org) and [MongoDB](https://www.mongodb.com/try/download/community) installed and running on your local machine (or use a MongoDB Atlas cluster URI).
+
+---
+
+### Step 1: Configure & Start the Backend
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install the server dependencies:
    ```bash
    npm install
    ```
+3. Create/update the `.env` file in the `backend/` folder:
+   ```env
+   PORT=5000
+   JWT_SECRET=your_jwt_secret_key
+   MONGO_URI=your_mongodb_connection_uri
+   ```
+4. Start the backend development server:
+   ```bash
+   npm run dev
+   ```
 
-2. Start the app
+The console should print:
+```text
+MongoDB Connected: <host_name>
+Server is running on port 5000 in development mode.
+```
 
+---
+
+### Step 2: Configure & Start the Frontend (Expo)
+
+1. Open a new terminal in the project root directory.
+2. Install the mobile dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure the local API address in `app/config.js` to point to the backend server.
+   - If testing on a **physical device** (with Expo Go), use your computer's local network IP:
+     ```javascript
+     export const API_URL = 'http://192.168.x.x:5000/api';
+     ```
+   - If testing on an **Android Emulator**, use loopback host:
+     ```javascript
+     export const API_URL = 'http://10.0.2.2:5000/api';
+     ```
+   - If testing on **iOS Simulator or Web**, use localhost:
+     ```javascript
+     export const API_URL = 'http://localhost:5000/api';
+     ```
+4. Launch the Expo bundler:
    ```bash
    npx expo start
    ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+5. Scan the QR code on your phone using Expo Go or run the Android/iOS simulators from the console commands.
