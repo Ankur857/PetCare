@@ -15,6 +15,8 @@ import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "./config";
 
 const NGOs = [
   {
@@ -65,32 +67,55 @@ export default function Rescue() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
+      base64: true,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const asset = result.assets[0];
+      setImage(`data:image/jpeg;base64,${asset.base64}`);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!image || !description) {
       Alert.alert("Missing Info", "Please add image and description.");
       return;
     }
 
-    console.log("Submitted to all NGOs:");
-    console.log("Location:", location);
-    console.log("Description:", description);
-    console.log("Image:", image);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch(`${API_URL}/rescue`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          image,
+          description,
+          location: location || "Lucknow",
+        }),
+      });
 
-    Alert.alert(
-      "Report Submitted",
-      "Your rescue request has been shared with all nearby NGOs."
-    );
+      const data = await response.json();
 
-    setDescription("");
-    setImage(null);
+      if (!response.ok) {
+        Alert.alert("Submission Failed", data.message || "Something went wrong.");
+        return;
+      }
+
+      Alert.alert(
+        "Report Submitted",
+        "Your rescue request has been saved and shared with nearby NGOs."
+      );
+
+      setDescription("");
+      setImage(null);
+    } catch (error) {
+      console.error("Rescue submit error:", error);
+      Alert.alert("Error", "Could not submit report. Please check connection.");
+    }
   };
 
   return (

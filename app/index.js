@@ -1,6 +1,8 @@
+import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Dimensions, Image, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const options = {
   headerShown: false,
@@ -9,6 +11,20 @@ export const options = {
 const { height, width } = Dimensions.get("window");
 
 export default function Index() {
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const user = await AsyncStorage.getItem("currentUser");
+        if (token && user) {
+          router.replace("/first");
+        }
+      } catch (error) {
+        console.error("Error checking login status:", error);
+      }
+    };
+    checkLogin();
+  }, []);
   return (
     <ImageBackground
       source={require("../assets/images/vetclinic_02.jpg")}

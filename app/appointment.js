@@ -17,6 +17,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "./config";
 
 
 const doctorData = [
@@ -61,17 +62,31 @@ export default function Appointment() {
     time: selectedTime,
     type: appointmentType,
     reason: reasonToShow,
-    timestamp: new Date().toISOString()
   };
 
   try {
-    const existing = await AsyncStorage.getItem("appointments");
-    const parsed = existing ? JSON.parse(existing) : [];
-    parsed.push(appointmentDetails);
-    await AsyncStorage.setItem("appointments", JSON.stringify(parsed));
+    const token = await AsyncStorage.getItem("token");
+    const response = await fetch(`${API_URL}/appointments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(appointmentDetails),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      Alert.alert("Error", data.message || "Could not schedule appointment.");
+      return;
+    }
+
     Alert.alert("Appointment Confirmed", `${appointmentDetails.pet} - ${appointmentDetails.date} at ${appointmentDetails.time}`);
+    router.replace("/first");
   } catch (error) {
-    Alert.alert("Error", "Could not save appointment.");
+    console.error("Booking error:", error);
+    Alert.alert("Error", "Could not connect to the server.");
   }
 };
 

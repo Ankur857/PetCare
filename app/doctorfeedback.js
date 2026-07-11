@@ -11,11 +11,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from "./config";
 
 export default function DoctorFeedback() {
-  const { doctorName, appointmentId } = useLocalSearchParams();
+  const { doctorName, doctor, appointmentId } = useLocalSearchParams();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
+
+  const activeDoctor = doctorName || doctor || "Doctor";
 
   const handleSubmit = async () => {
     if (rating === 0) {
@@ -23,23 +26,33 @@ export default function DoctorFeedback() {
       return;
     }
 
-    const newFeedback = {
-      doctor: doctorName,
-      rating,
-      review,
-      date: new Date().toLocaleDateString(),
-    };
-
     try {
-      const stored = await AsyncStorage.getItem("feedbacks");
-      const feedbacks = stored ? JSON.parse(stored) : [];
-      feedbacks.push(newFeedback);
-      await AsyncStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch(`${API_URL}/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          doctor: activeDoctor,
+          rating,
+          review,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert("Error", data.message || "Failed to submit feedback.");
+        return;
+      }
 
       Alert.alert("Thank You!", "Your feedback has been submitted.");
       router.back();
     } catch (error) {
       console.error("Error saving feedback:", error);
+      Alert.alert("Error", "Could not submit feedback. Please check connection.");
     }
   };
 
@@ -53,7 +66,7 @@ export default function DoctorFeedback() {
       </View>
 
       <View style={styles.container}>
-        <Text style={styles.label}>Doctor: {doctorName}</Text>
+        <Text style={styles.label}>Doctor: {activeDoctor}</Text>
         <Text style={styles.label}>Rate your experience:</Text>
 
         <View style={styles.stars}>

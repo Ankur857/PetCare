@@ -4,15 +4,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { API_URL } from "./config";
 
 export default function AppointmentRecords() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await AsyncStorage.getItem("appointments");
-      if (data) {
-        setAppointments(JSON.parse(data).reverse()); // most recent first
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const response = await fetch(`${API_URL}/appointments`, {
+          method: "GET",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setAppointments(data);
+        }
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
       }
     };
     fetchData();

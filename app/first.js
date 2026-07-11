@@ -131,6 +131,7 @@ export default function First() {
           text: 'Logout',
           onPress: async () => {
             await AsyncStorage.removeItem('currentUser');
+            await AsyncStorage.removeItem('token');
             router.replace('/');
           }
         }

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackgr
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from './config';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -24,22 +25,27 @@ export default function Signup() {
     }
 
     try {
-      const users = await AsyncStorage.getItem('users');
-      const parsedUsers = users ? JSON.parse(users) : [];
-      const userExists = parsedUsers.find(u => u.email === email);
+      const response = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-      if (userExists) {
-        Alert.alert('Error', 'User with this email already exists');
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Signup Failed', data.message || 'Something went wrong');
         return;
       }
 
-      const newUser = { name, email, password };
-      parsedUsers.push(newUser);
-      await AsyncStorage.setItem('users', JSON.stringify(parsedUsers));
-      await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
+      await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('currentUser', JSON.stringify(data.user));
       router.replace('/first');
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong');
+      console.error('Signup error:', error);
+      Alert.alert('Error', 'Could not connect to the server');
     }
   };
 
