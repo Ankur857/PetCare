@@ -1,14 +1,18 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./config/db');
+const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const rescueRoutes = require('./routes/rescueRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Basic Route
 app.get('/', (req, res) => {
@@ -17,18 +21,15 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/rescue', rescueRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
-// Sync DB and Start Server
+// Connect DB and Start Server
 const PORT = process.env.PORT || 5000;
 
-sequelize
-  .sync() // sync models with database
-  .then(() => {
-    console.log('SQLite Database connected and synced successfully.');
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode.`);
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to sync database:', err);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode.`);
   });
+});

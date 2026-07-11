@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
     }
 
     // Check if user exists
-    const userExists = await User.findOne({ where: { email } });
+    const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -39,9 +39,9 @@ exports.signup = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        token: generateToken(user.id),
+        token: generateToken(user._id),
         user: {
-          id: user.id,
+          id: user._id,
           name: user.name,
           email: user.email,
         },
@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -79,9 +79,9 @@ exports.login = async (req, res) => {
     }
 
     res.json({
-      token: generateToken(user.id),
+      token: generateToken(user._id),
       user: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         email: user.email,
       },
@@ -97,9 +97,7 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: { exclude: ['password'] }
-    });
+    const user = await User.findById(req.user.id).select('-password');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
