@@ -20,6 +20,7 @@ import { useEffect, useRef, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -111,6 +112,8 @@ export default function First() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const getUser = async () => {
       const user = await AsyncStorage.getItem('currentUser');
@@ -118,8 +121,10 @@ export default function First() {
         setCurrentUser(JSON.parse(user));
       }
     };
-    getUser();
-  }, []);
+    if (isFocused) {
+      getUser();
+    }
+  }, [isFocused]);
 
   const handleLogout = async () => {
     Alert.alert(
@@ -164,17 +169,35 @@ export default function First() {
       {/* Profile Menu */}
       {showProfileMenu && (
         <View style={styles.profileMenu}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              setShowProfileMenu(false);
+              router.push("/profile");
+            }}
+          >
             <AntDesign name="user" size={20} color="#555" style={styles.menuIcon} />
             <Text style={styles.menuText}>My Profile</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/appointmentRecords")}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              setShowProfileMenu(false);
+              router.push("/appointmentRecords");
+            }}
+          >
             <Entypo name="calendar" size={20} color="#555" style={styles.menuIcon} />
             <Text style={styles.menuText}>Appointments</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              setShowProfileMenu(false);
+              router.push("/settings");
+            }}
+          >
             <Entypo name="cog" size={20} color="#555" style={styles.menuIcon} />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
