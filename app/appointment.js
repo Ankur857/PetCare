@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,16 +14,60 @@ import {
 import { Calendar } from "react-native-calendars";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "./config";
 
 const doctorData = [
-  { id: "1", name: "Dr. Diwakar Singh", specialty: "BVSc", image: require("../assets/images/doc.png") },
-  { id: "2", name: "Dr. Saurabh Chaturvedi", specialty: "BVSc, MVSc", image: require("../assets/images/doc.png") },
-  { id: "3", name: "Dr. Gopal Krishna Shukla", specialty: "BVSc, MVSc", image: require("../assets/images/doc.png") },
-  { id: "4", name: "Dr. Rahul Chandra", specialty: "BVSc, MVSc", image: require("../assets/images/doc.png") },
+  {
+    id: "1",
+    name: "Dr. Diwakar Singh",
+    specialty: "BVSc & AH (Senior Vet)",
+    rating: "4.9",
+    experience: "12 Years",
+    patients: "1,800+ Pets",
+    fee: "$25",
+    location: "Paws & Claws Clinic, Lucknow",
+    bio: "Dr. Diwakar is a passionate veterinarian dedicated to small animal wellness. He specializes in canine diagnostics and preventative care.",
+    image: require("../assets/images/doc.png"),
+  },
+  {
+    id: "2",
+    name: "Dr. Saurabh Chaturvedi",
+    specialty: "BVSc, MVSc (Surgeon)",
+    rating: "4.8",
+    experience: "8 Years",
+    patients: "1,200+ Pets",
+    fee: "$35",
+    location: "Metro Pet Hospital, Lucknow",
+    bio: "Dr. Saurabh specializes in orthopedic and soft-tissue animal surgeries. He is committed to providing high-quality operative treatments.",
+    image: require("../assets/images/doc.png"),
+  },
+  {
+    id: "3",
+    name: "Dr. Gopal K. Shukla",
+    specialty: "BVSc, MVSc (Pediatrician)",
+    rating: "4.9",
+    experience: "15 Years",
+    patients: "2,500+ Pets",
+    fee: "$30",
+    location: "Pet Care Medical Center, Lucknow",
+    bio: "Dr. Gopal is an expert in puppy growth stages and feline pediatric medicine. He aims to make vet visits stress-free for young pets.",
+    image: require("../assets/images/doc.png"),
+  },
+  {
+    id: "4",
+    name: "Dr. Rahul Chandra",
+    specialty: "BVSc, MVSc (Dermatology)",
+    rating: "4.7",
+    experience: "6 Years",
+    patients: "900+ Pets",
+    fee: "$28",
+    location: "Fur & Skin Specialty Clinic, Lucknow",
+    bio: "Dr. Rahul treats complicated pet skin conditions, allergies, and ear infections. He utilizes advanced diagnostic skin testing methods.",
+    image: require("../assets/images/doc.png"),
+  },
 ];
 
 const dogBreeds = [
@@ -38,6 +82,7 @@ const dogBreeds = [
 const reasons = ["Vaccination", "Injury", "Regular Checkup", "Skin Issues", "Dental Problems", "Other"];
 
 export default function Appointment() {
+  const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [appointmentType, setAppointmentType] = useState(null);
@@ -46,6 +91,16 @@ export default function Appointment() {
   const [selectedReason, setSelectedReason] = useState(null);
   const [customReason, setCustomReason] = useState("");
   const [isBooking, setIsBooking] = useState(false);
+
+  // Deep-link auto-select doctor if passed from dashboard
+  useEffect(() => {
+    if (params?.doctorId) {
+      const doc = doctorData.find((d) => d.id === params.doctorId);
+      if (doc) {
+        setSelectedDoctor(doc);
+      }
+    }
+  }, [params?.doctorId]);
 
   const handleBooking = async () => {
     if (!selectedPet || !selectedDoctor || !selectedTime || !appointmentType || !selectedReason || (selectedReason === "Other" && !customReason.trim())) {
@@ -137,6 +192,31 @@ export default function Appointment() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+
+          {/* Selected Doctor Summary Profile Details */}
+          {selectedDoctor && (
+            <View style={styles.doctorSummaryBox}>
+              <Text style={styles.summaryTitle}>Doctor Information</Text>
+              <View style={styles.summaryGrid}>
+                <View style={styles.summaryCol}>
+                  <Text style={styles.summaryLabel}>Consultation Fee</Text>
+                  <Text style={styles.summaryVal}>{selectedDoctor.fee}</Text>
+                </View>
+                <View style={styles.summaryCol}>
+                  <Text style={styles.summaryLabel}>Experience</Text>
+                  <Text style={styles.summaryVal}>{selectedDoctor.experience}</Text>
+                </View>
+                <View style={styles.summaryCol}>
+                  <Text style={styles.summaryLabel}>Patients Served</Text>
+                  <Text style={styles.summaryVal}>{selectedDoctor.patients}</Text>
+                </View>
+              </View>
+              <Text style={styles.summaryLabel}>Clinic Location</Text>
+              <Text style={styles.summaryLocationText}>{selectedDoctor.location}</Text>
+              <Text style={styles.summaryLabel}>About Doctor</Text>
+              <Text style={styles.summaryBioText}>{selectedDoctor.bio}</Text>
+            </View>
+          )}
 
           {/* Calendar */}
           <Text style={styles.heading}>Select Date</Text>
@@ -334,6 +414,52 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     textAlign: "center",
     marginTop: 2,
+  },
+  doctorSummaryBox: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    padding: 16,
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  summaryTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#1e293b",
+    marginBottom: 12,
+  },
+  summaryGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  summaryCol: {
+    width: "30%",
+  },
+  summaryLabel: {
+    fontSize: 11,
+    color: "#94a3b8",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  summaryVal: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#6d48ff",
+  },
+  summaryLocationText: {
+    fontSize: 13,
+    color: "#334155",
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  summaryBioText: {
+    fontSize: 12,
+    color: "#64748b",
+    lineHeight: 18,
   },
   calendar: {
     borderRadius: 16,

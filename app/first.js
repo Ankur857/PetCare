@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Modal,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -29,19 +30,19 @@ const cardData = [
   {
     id: "1",
     title: "Find Your Ideal Dog",
-    subtitle: "Explore breeds that suit your home, lifestyle, and energy level",
+    subtitle: "Explore breeds that suit your lifestyle, home, and energy level.",
     image: require("../assets/images/dog1.png"),
   },
   {
     id: "2",
     title: "Be a Responsible Owner",
-    subtitle: "Dogs need love, care, and regular veterinary checkups",
+    subtitle: "Dogs need love, care, and regular veterinary checkups.",
     image: require("../assets/images/dog2.png"),
   },
   {
     id: "3",
     title: "Adopt, Don’t Shop 🐾",
-    subtitle: "Give a homeless pet a second chance to live and love",
+    subtitle: "Give a homeless pet a second chance to live and love again.",
     image: require("../assets/images/dog3.png"),
   },
 ];
@@ -61,6 +62,11 @@ const doctorData = [
     name: "Dr. Diwakar Singh",
     specialty: "BVSc & AH (Senior Vet)",
     rating: "4.9",
+    experience: "12 Years",
+    patients: "1,800+ Pets",
+    fee: "$25",
+    location: "Paws & Claws Clinic, Lucknow",
+    bio: "Dr. Diwakar is a passionate veterinarian dedicated to small animal wellness. He specializes in canine diagnostics and preventative care.",
     image: require("../assets/images/doc.png"),
   },
   {
@@ -68,6 +74,11 @@ const doctorData = [
     name: "Dr. Saurabh Chaturvedi",
     specialty: "BVSc, MVSc (Surgeon)",
     rating: "4.8",
+    experience: "8 Years",
+    patients: "1,200+ Pets",
+    fee: "$35",
+    location: "Metro Pet Hospital, Lucknow",
+    bio: "Dr. Saurabh specializes in orthopedic and soft-tissue animal surgeries. He is committed to providing high-quality operative treatments.",
     image: require("../assets/images/doc.png"),
   },
   {
@@ -75,6 +86,11 @@ const doctorData = [
     name: "Dr. Gopal K. Shukla",
     specialty: "BVSc, MVSc (Pediatrician)",
     rating: "4.9",
+    experience: "15 Years",
+    patients: "2,500+ Pets",
+    fee: "$30",
+    location: "Pet Care Medical Center, Lucknow",
+    bio: "Dr. Gopal is an expert in puppy growth stages and feline pediatric medicine. He aims to make vet visits stress-free for young pets.",
     image: require("../assets/images/doc.png"),
   },
   {
@@ -82,39 +98,20 @@ const doctorData = [
     name: "Dr. Rahul Chandra",
     specialty: "BVSc, MVSc (Dermatology)",
     rating: "4.7",
+    experience: "6 Years",
+    patients: "900+ Pets",
+    fee: "$28",
+    location: "Fur & Skin Specialty Clinic, Lucknow",
+    bio: "Dr. Rahul treats complicated pet skin conditions, allergies, and ear infections. He utilizes advanced diagnostic skin testing methods.",
     image: require("../assets/images/doc.png"),
   },
 ];
 
-const chunkArray = (array, size) => {
-  const chunked = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunked.push(array.slice(i, i + size));
-  }
-  return chunked;
-};
-
-const categoryPages = chunkArray(categories, 3);
-
-const Card = ({ title, subtitle, image }) => (
-  <LinearGradient
-    colors={["#6d48ff", "#8e44ad"]}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.card}
-  >
-    <View style={styles.textContainer}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardSubtitle}>{subtitle}</Text>
-    </View>
-    <Image source={image} style={styles.cardImage} />
-  </LinearGradient>
-);
-
 export default function First() {
-  const flatListRef = useRef(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [selectedDoctorModal, setSelectedDoctorModal] = useState(null);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -152,13 +149,21 @@ export default function First() {
     return userName.trim().substring(0, 1).toUpperCase();
   };
 
+  const handleConsultDoctor = (docId) => {
+    setSelectedDoctorModal(null);
+    router.push({
+      pathname: "/appointment",
+      params: { doctorId: docId },
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Top Header */}
       <View style={styles.header}>
-        <View style={styles.headerUserInfo}>
+        <View style={styles.userInfoRow}>
           <TouchableOpacity
-            style={styles.profileBtn}
+            style={styles.avatarWrapper}
             onPress={() => setShowProfileMenu((prev) => !prev)}
           >
             <LinearGradient
@@ -168,185 +173,277 @@ export default function First() {
               <Text style={styles.avatarText}>{getInitials(currentUser?.name)}</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <View style={{ marginLeft: 12 }}>
+          <View style={styles.userTextContainer}>
             <Text style={styles.welcomeText}>Hello, {currentUser?.name || 'Guest'} 👋</Text>
-            <Text style={styles.subWelcome}>How is your pet doing today?</Text>
+            <Text style={styles.subWelcomeText}>Your pets are in safe hands</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.notifyIcon} onPress={() => Alert.alert("Notifications", "You have no new notifications.")}>
-          <View style={styles.bellWrapper}>
-            <Ionicons name="notifications-outline" size={26} color="#1f2937" />
-            <View style={styles.activeDot} />
+        <TouchableOpacity 
+          style={styles.bellButton} 
+          onPress={() => Alert.alert("Notifications", "All set! No new notifications.")}
+        >
+          <View style={styles.bellBadgeContainer}>
+            <Ionicons name="notifications-outline" size={24} color="#1f2937" />
+            <View style={styles.notificationDot} />
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Profile Menu Dropdown */}
+      {/* Dropdown Profile Menu */}
       {showProfileMenu && (
-        <View style={styles.profileMenu}>
+        <View style={styles.profileMenuDropdown}>
           <TouchableOpacity
-            style={styles.menuItem}
+            style={styles.dropdownItem}
             onPress={() => {
               setShowProfileMenu(false);
               router.push("/profile");
             }}
           >
-            <AntDesign name="user" size={18} color="#4b5563" style={styles.menuIcon} />
-            <Text style={styles.menuText}>My Profile</Text>
+            <AntDesign name="user" size={18} color="#4b5563" style={styles.dropdownIcon} />
+            <Text style={styles.dropdownText}>My Profile</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={styles.dropdownItem}
             onPress={() => {
               setShowProfileMenu(false);
               router.push("/appointmentRecords");
             }}
           >
-            <Entypo name="calendar" size={18} color="#4b5563" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Appointments</Text>
+            <Entypo name="calendar" size={18} color="#4b5563" style={styles.dropdownIcon} />
+            <Text style={styles.dropdownText}>Appointments</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={styles.dropdownItem}
             onPress={() => {
               setShowProfileMenu(false);
               router.push("/settings");
             }}
           >
-            <Entypo name="cog" size={18} color="#4b5563" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Settings</Text>
+            <Entypo name="cog" size={18} color="#4b5563" style={styles.dropdownIcon} />
+            <Text style={styles.dropdownText}>Settings</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={handleLogout}>
-            <AntDesign name="logout" size={18} color="#ef4444" style={styles.menuIcon} />
-            <Text style={[styles.menuText, { color: "#ef4444", fontWeight: '600' }]}>Logout</Text>
+          <TouchableOpacity style={[styles.dropdownItem, { borderBottomWidth: 0 }]} onPress={handleLogout}>
+            <AntDesign name="logout" size={18} color="#ef4444" style={styles.dropdownIcon} />
+            <Text style={[styles.dropdownText, { color: "#ef4444", fontWeight: '700' }]}>Logout</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Scrollable Dashboard Body */}
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Promotional Slide Cards */}
-        <View style={styles.carouselContainer}>
+      {/* Main Dashboard Scrollable View */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
+        
+        {/* Promotional Slide Banner */}
+        <View style={styles.sliderContainer}>
           <FlatList
-            ref={flatListRef}
             data={cardData}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
+            onMomentumScrollEnd={(e) => {
+              const slideIndex = Math.round(e.nativeEvent.contentOffset.x / (width - 32));
+              setActiveSlide(slideIndex);
+            }}
             renderItem={({ item }) => (
-              <View style={styles.carouselSlide}>
-                <Card
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  image={item.image}
-                />
-              </View>
-            )}
-          />
-        </View>
-
-        {/* Dog Breeds Categories */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionHeading}>Explore Dog Breeds</Text>
-        </View>
-
-        <FlatList
-          data={categoryPages}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.categoryPage}>
-              {item.map((category) => (
-                <View key={category.id} style={styles.categoryItem}>
-                  <TouchableOpacity
-                    style={styles.breedCircle}
-                    onPress={() => {
-                      let route = "";
-                      if (category.name === "Labrador") route = "/labrodor";
-                      else if (category.name === "German Shepherd") route = "/german";
-                      else if (category.name === "Pug") route = "/pug";
-                      else {
-                        Alert.alert("Breed Info", `${category.name} detailed profile is coming soon!`);
-                        return;
-                      }
-                      router.push({
-                        pathname: route,
-                        params: { id: category.id, name: category.name },
-                      });
-                    }}
-                  >
-                    <Image source={category.image} style={styles.breedImg} />
-                  </TouchableOpacity>
-                  <Text style={styles.categoryLabel}>{category.name}</Text>
+              <LinearGradient
+                colors={["#6d48ff", "#8e44ad"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.promoCard}
+              >
+                <View style={styles.promoTextCol}>
+                  <Text style={styles.promoTitle}>{item.title}</Text>
+                  <Text style={styles.promoSubtitle}>{item.subtitle}</Text>
                 </View>
-              ))}
-            </View>
-          )}
-        />
-
-        {/* Best Doctors Section */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionHeading}>Best Doctors</Text>
+                <Image source={item.image} style={styles.promoImage} />
+              </LinearGradient>
+            )}
+            contentContainerStyle={styles.sliderContent}
+          />
+          {/* Slide Indicator Dots */}
+          <View style={styles.dotsRow}>
+            {cardData.map((_, idx) => (
+              <View 
+                key={idx} 
+                style={[
+                  styles.dot, 
+                  activeSlide === idx ? styles.activeDot : styles.inactiveDot
+                ]} 
+              />
+            ))}
+          </View>
         </View>
 
-        <ScrollView
-          horizontal
+        {/* Categories Section (Dog Breeds) */}
+        <Text style={styles.sectionHeader}>Explore Dog Breeds</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.categoryScroll}
+        >
+          {categories.map((category) => (
+            <View key={category.id} style={styles.categoryCard}>
+              <TouchableOpacity
+                style={styles.categoryImageWrapper}
+                onPress={() => {
+                  let route = "";
+                  if (category.name === "Labrador") route = "/labrodor";
+                  else if (category.name === "German Shepherd") route = "/german";
+                  else if (category.name === "Pug") route = "/pug";
+                  else {
+                    Alert.alert("Breed Profile", `${category.name} details are coming soon!`);
+                    return;
+                  }
+                  router.push({
+                    pathname: route,
+                    params: { id: category.id, name: category.name },
+                  });
+                }}
+              >
+                <Image source={category.image} style={styles.categoryImage} />
+              </TouchableOpacity>
+              <Text style={styles.categoryName} numberOfLines={1}>{category.name}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Doctor List Section */}
+        <View style={styles.sectionTitleRow}>
+          <Text style={styles.sectionHeader}>Top Veterinarians</Text>
+          <TouchableOpacity onPress={() => router.push("/appointment")}>
+            <Text style={styles.seeAllText}>Book appointment</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView 
+          horizontal 
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.doctorsScroll}
         >
-          {doctorData.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.doctorCard} onPress={() => router.push("/appointment")}>
-              <View style={styles.doctorImageContainer}>
-                <Image source={item.image} style={styles.doctorImage} />
+          {doctorData.map((doc) => (
+            <TouchableOpacity 
+              key={doc.id} 
+              style={styles.doctorItemCard} 
+              onPress={() => setSelectedDoctorModal(doc)}
+            >
+              <View style={styles.doctorAvatarContainer}>
+                <Image source={doc.image} style={styles.doctorAvatar} />
                 <View style={styles.ratingBadge}>
-                  <Ionicons name="star" size={10} color="#fff" />
-                  <Text style={styles.ratingText}>{item.rating}</Text>
+                  <Ionicons name="star" size={10} color="#fff" style={{ marginRight: 2 }} />
+                  <Text style={styles.ratingText}>{doc.rating}</Text>
                 </View>
               </View>
-              <Text style={styles.doctorName} numberOfLines={1}>{item.name}</Text>
-              <Text style={styles.doctorSpecialty} numberOfLines={1}>{item.specialty}</Text>
+              
+              <Text style={styles.doctorCardName} numberOfLines={1}>{doc.name}</Text>
+              <Text style={styles.doctorCardSpec} numberOfLines={1}>{doc.specialty}</Text>
+              <Text style={styles.doctorCardExp}>{doc.experience} exp</Text>
+
+              <TouchableOpacity 
+                style={styles.consultBtn}
+                onPress={() => setSelectedDoctorModal(doc)}
+              >
+                <Text style={styles.consultBtnText}>Details</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </ScrollView>
 
-      {/* Bottom Nav */}
+      {/* Doctor Profile Details Modal */}
+      {selectedDoctorModal && (
+        <Modal
+          visible={selectedDoctorModal !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setSelectedDoctorModal(null)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              {/* Close Button */}
+              <TouchableOpacity 
+                style={styles.modalCloseBtn}
+                onPress={() => setSelectedDoctorModal(null)}
+              >
+                <Ionicons name="close" size={22} color="#475569" />
+              </TouchableOpacity>
+
+              {/* Photo & Basic Info */}
+              <Image source={selectedDoctorModal.image} style={styles.modalDoctorAvatar} />
+              <Text style={styles.modalDoctorName}>{selectedDoctorModal.name}</Text>
+              <Text style={styles.modalDoctorSpec}>{selectedDoctorModal.specialty}</Text>
+
+              <View style={styles.modalRatingRow}>
+                <Ionicons name="star" size={16} color="#fbbf24" style={{ marginRight: 4 }} />
+                <Text style={styles.modalRatingText}>{selectedDoctorModal.rating} rating</Text>
+              </View>
+
+              {/* Doctor Stats Grid */}
+              <View style={styles.statsCardGrid}>
+                <View style={styles.statColumn}>
+                  <Text style={styles.statLabel}>Fee</Text>
+                  <Text style={styles.statValue}>{selectedDoctorModal.fee}</Text>
+                </View>
+                <View style={styles.statColumn}>
+                  <Text style={styles.statLabel}>Experience</Text>
+                  <Text style={styles.statValue}>{selectedDoctorModal.experience}</Text>
+                </View>
+                <View style={styles.statColumn}>
+                  <Text style={styles.statLabel}>Patients</Text>
+                  <Text style={styles.statValue}>{selectedDoctorModal.patients}</Text>
+                </View>
+              </View>
+
+              {/* Hospital Location */}
+              <View style={styles.detailItemRow}>
+                <Ionicons name="location-sharp" size={18} color="#ef4444" style={{ marginRight: 8 }} />
+                <Text style={styles.detailItemText} numberOfLines={2}>
+                  {selectedDoctorModal.location}
+                </Text>
+              </View>
+
+              {/* Doctor Bio */}
+              <View style={styles.bioBox}>
+                <Text style={styles.bioHeading}>About Doctor</Text>
+                <Text style={styles.bioText}>{selectedDoctorModal.bio}</Text>
+              </View>
+
+              {/* Book Appointment CTA */}
+              <TouchableOpacity
+                style={styles.modalBookBtn}
+                onPress={() => handleConsultDoctor(selectedDoctorModal.id)}
+              >
+                <Ionicons name="calendar-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.modalBookBtnText}>Book Consultation</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Glassmorphic Bottom Nav Bar */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/first")}
-        >
+        <TouchableOpacity style={styles.navLink} onPress={() => router.push("/first")}>
           <Entypo name="home" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Home</Text>
+          <Text style={styles.navLinkLabel}>Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/appointment")}
-        >
+        <TouchableOpacity style={styles.navLink} onPress={() => router.push("/appointment")}>
           <Entypo name="calendar" size={22} color="#fff" style={{ opacity: 0.8 }} />
-          <Text style={styles.navLabel}>Appointment</Text>
+          <Text style={styles.navLinkLabel}>Appointment</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/rescue")}
-        >
+        <TouchableOpacity style={styles.navLink} onPress={() => router.push("/rescue")}>
           <Ionicons name="paw-outline" size={22} color="#fff" style={{ opacity: 0.8 }} />
-          <Text style={styles.navLabel}>Rescue</Text>
+          <Text style={styles.navLinkLabel}>Rescue</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/appointmentRecords")}
-        >
+        <TouchableOpacity style={styles.navLink} onPress={() => router.push("/appointmentRecords")}>
           <Ionicons name="document-text-outline" size={22} color="#fff" style={{ opacity: 0.8 }} />
-          <Text style={styles.navLabel}>Records</Text>
+          <Text style={styles.navLinkLabel}>Records</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -356,257 +453,447 @@ export default function First() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#f8fafc",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
     justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#f3f4f6",
+    borderBottomColor: "#f1f5f9",
   },
-  headerUserInfo: {
+  userInfoRow: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
   },
-  profileBtn: {
+  avatarWrapper: {
     shadowColor: "#6d48ff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 4,
   },
   avatarGradient: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 16,
   },
   avatarText: {
     color: "#fff",
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "800",
+  },
+  userTextContainer: {
+    marginLeft: 12,
   },
   welcomeText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#111827",
+    color: "#1e293b",
   },
-  subWelcome: {
+  subWelcomeText: {
     fontSize: 12,
-    color: "#6b7280",
+    color: "#64748b",
     marginTop: 2,
   },
-  bellWrapper: {
-    position: "relative",
-    padding: 6,
+  bellButton: {
+    padding: 8,
     borderRadius: 12,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#f1f5f9",
   },
-  activeDot: {
+  bellBadgeContainer: {
+    position: "relative",
+  },
+  notificationDot: {
     position: "absolute",
-    top: 6,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: 1,
+    right: 2,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: "#ef4444",
   },
-  profileMenu: {
+  profileMenuDropdown: {
     position: "absolute",
     top: 76,
     left: 20,
     backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingVertical: 8,
+    borderRadius: 16,
+    paddingVertical: 6,
     paddingHorizontal: 12,
-    shadowColor: "#000",
+    shadowColor: "#0f172a",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.1,
     shadowRadius: 20,
-    elevation: 10,
+    elevation: 8,
     zIndex: 100,
-    width: 180,
+    width: 170,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#e2e8f0",
   },
-  menuItem: {
+  dropdownItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    paddingHorizontal: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#f3f4f6",
+    borderBottomColor: "#f1f5f9",
   },
-  menuIcon: {
-    marginRight: 12,
+  dropdownIcon: {
+    marginRight: 10,
   },
-  menuText: {
+  dropdownText: {
     fontSize: 14,
-    color: "#1f2937",
-    fontWeight: "500",
+    color: "#334155",
+    fontWeight: "600",
   },
-  scrollContent: {
-    paddingBottom: 140,
+  scrollContainer: {
+    paddingBottom: 130,
   },
-  carouselContainer: {
-    height: hp(24),
-    marginTop: 10,
+  sliderContainer: {
+    marginTop: 16,
+    marginBottom: 20,
   },
-  carouselSlide: {
-    width: width,
-    alignItems: "center",
-    justifyContent: "center",
+  sliderContent: {
+    paddingLeft: 16,
+    paddingRight: 8,
   },
-  card: {
+  promoCard: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
+    width: width - 32,
+    marginRight: 16,
     borderRadius: 24,
-    width: width - 40,
-    height: hp(20),
+    padding: 20,
+    height: 140,
     shadowColor: "#6d48ff",
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 6,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  textContainer: {
+  promoTextCol: {
     flex: 1,
-    paddingRight: 10,
+    paddingRight: 8,
   },
-  cardTitle: {
+  promoTitle: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "800",
-    lineHeight: 22,
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  cardSubtitle: {
+  promoSubtitle: {
     color: "rgba(255, 255, 255, 0.85)",
     fontSize: 12,
     lineHeight: 16,
   },
-  cardImage: {
-    width: 100,
-    height: 100,
+  promoImage: {
+    width: 90,
+    height: 90,
     resizeMode: "contain",
   },
-  sectionHeaderRow: {
+  dotsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 28,
-    marginBottom: 16,
+    marginTop: 10,
   },
-  sectionHeading: {
+  dot: {
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 3,
+  },
+  activeDot: {
+    width: 16,
+    backgroundColor: "#6d48ff",
+  },
+  inactiveDot: {
+    width: 6,
+    backgroundColor: "#cbd5e1",
+  },
+  sectionHeader: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#1f2937",
+    color: "#1e293b",
+    marginLeft: 20,
+    marginTop: 10,
+    marginBottom: 14,
   },
-  categoryPage: {
-    width: width,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
+  categoryScroll: {
+    paddingLeft: 20,
+    paddingRight: 8,
+    paddingBottom: 8,
   },
-  categoryItem: {
-    width: (width - 64) / 3,
+  categoryCard: {
     alignItems: "center",
+    marginRight: 16,
+    width: 76,
   },
-  breedCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: "#6d48ff",
+  categoryImageWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#e2e8f0",
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 6,
     elevation: 2,
-    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  breedImg: {
+  categoryImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
   },
-  categoryLabel: {
-    fontSize: 13,
-    color: "#4b5563",
-    textAlign: "center",
-    fontWeight: "600",
+  categoryName: {
+    fontSize: 12,
+    color: "#475569",
+    fontWeight: "700",
     marginTop: 8,
+    textAlign: "center",
+    width: "100%",
+  },
+  sectionTitleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingRight: 20,
+    marginTop: 18,
+  },
+  seeAllText: {
+    fontSize: 13,
+    color: "#6d48ff",
+    fontWeight: "700",
   },
   doctorsScroll: {
     paddingLeft: 20,
-    paddingRight: 10,
+    paddingRight: 8,
+    paddingBottom: 12,
   },
-  doctorCard: {
+  doctorItemCard: {
     backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 14,
+    borderRadius: 24,
+    padding: 16,
     alignItems: "center",
     width: 140,
     marginRight: 12,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    shadowColor: "#000",
+    borderColor: "#f1f5f9",
+    shadowColor: "#0f172a",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.02,
+    shadowOpacity: 0.03,
     shadowRadius: 8,
     elevation: 2,
   },
-  doctorImageContainer: {
+  doctorAvatarContainer: {
     position: "relative",
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  doctorImage: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 2,
-    borderColor: "#e5e7eb",
+  doctorAvatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: "#e2e8f0",
   },
   ratingBadge: {
     position: "absolute",
-    bottom: -2,
-    right: -4,
+    bottom: -4,
+    right: -6,
     backgroundColor: "#fbbf24",
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 2,
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#fff",
   },
   ratingText: {
     color: "#fff",
     fontSize: 10,
     fontWeight: "700",
-    marginLeft: 2,
   },
-  doctorName: {
+  doctorCardName: {
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "800",
+    color: "#1e293b",
     textAlign: "center",
-    color: "#1f2937",
     width: "100%",
   },
-  doctorSpecialty: {
+  doctorCardSpec: {
     fontSize: 11,
-    color: "#6b7280",
+    color: "#64748b",
+    textAlign: "center",
+    marginTop: 3,
+    width: "100%",
+  },
+  doctorCardExp: {
+    fontSize: 10,
+    color: "#94a3b8",
+    textAlign: "center",
+    marginTop: 2,
+    fontWeight: "600",
+  },
+  consultBtn: {
+    backgroundColor: "#eff6ff",
+    borderRadius: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    width: "100%",
+    alignItems: "center",
+  },
+  consultBtnText: {
+    color: "#2563eb",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    backgroundColor: "#fff",
+    borderRadius: 28,
+    width: "100%",
+    padding: 24,
+    alignItems: "center",
+    position: "relative",
+    shadowColor: "#0f172a",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  modalCloseBtn: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    padding: 6,
+    borderRadius: 12,
+    backgroundColor: "#f1f5f9",
+  },
+  modalDoctorAvatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: "#e2e8f0",
+    marginBottom: 16,
+  },
+  modalDoctorName: {
+    fontSize: 20,
+    fontWeight: "850",
+    color: "#1e293b",
+    textAlign: "center",
+  },
+  modalDoctorSpec: {
+    fontSize: 13,
+    color: "#64748b",
     textAlign: "center",
     marginTop: 4,
+  },
+  modalRatingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  modalRatingText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#475569",
+  },
+  statsCardGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     width: "100%",
+    backgroundColor: "#f8fafc",
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
+    marginBottom: 20,
+  },
+  statColumn: {
+    alignItems: "center",
+    width: "30%",
+  },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#94a3b8",
+    textTransform: "uppercase",
+  },
+  statValue: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#6d48ff",
+    marginTop: 4,
+  },
+  detailItemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20,
+    paddingHorizontal: 8,
+  },
+  detailItemText: {
+    fontSize: 13,
+    color: "#334155",
+    fontWeight: "600",
+    flex: 1,
+  },
+  bioBox: {
+    width: "100%",
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  bioHeading: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#94a3b8",
+    textTransform: "uppercase",
+    marginBottom: 6,
+  },
+  bioText: {
+    fontSize: 13,
+    color: "#475569",
+    lineHeight: 18,
+  },
+  modalBookBtn: {
+    flexDirection: "row",
+    backgroundColor: "#6d48ff",
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  modalBookBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
   },
   bottomNav: {
     flexDirection: "row",
@@ -628,10 +915,10 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
   },
-  navItem: {
+  navLink: {
     alignItems: "center",
   },
-  navLabel: {
+  navLinkLabel: {
     color: "#fff",
     fontSize: 12,
     marginTop: 6,
