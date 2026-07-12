@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "coaching",
-    "slug": "coaching",
+    "name": "PawPal",
+    "slug": "pawpal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/doc.png",
-    "scheme": "coaching",
+    "scheme": "pawpal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -17,7 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.ankur85.coaching"
+      "package": "com.ankur85.pawpal"
     },
     "web": {
       "bundler": "metro",

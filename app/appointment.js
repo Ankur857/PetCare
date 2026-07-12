@@ -7,9 +7,9 @@ import {
   Pressable,
   Alert,
   Image,
-  Animated,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +18,6 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "./config";
-
 
 const doctorData = [
   { id: "1", name: "Dr. Diwakar Singh", specialty: "BVSc", image: require("../assets/images/doc.png") },
@@ -46,95 +45,101 @@ export default function Appointment() {
   const [selectedPet, setSelectedPet] = useState(null);
   const [selectedReason, setSelectedReason] = useState(null);
   const [customReason, setCustomReason] = useState("");
+  const [isBooking, setIsBooking] = useState(false);
 
- const handleBooking = async () => {
-  if (!selectedPet || !selectedDoctor || !selectedTime || !appointmentType || !selectedReason || (selectedReason === "Other" && !customReason.trim())) {
-    Alert.alert("Missing Fields", "Please complete all required fields.");
-    return;
-  }
-
-  const reasonToShow = selectedReason === "Other" ? customReason : selectedReason;
-
-  const appointmentDetails = {
-    pet: selectedPet.name,
-    doctor: selectedDoctor.name,
-    date: selectedDate,
-    time: selectedTime,
-    type: appointmentType,
-    reason: reasonToShow,
-  };
-
-  try {
-    const token = await AsyncStorage.getItem("token");
-    const response = await fetch(`${API_URL}/appointments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify(appointmentDetails),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      Alert.alert("Error", data.message || "Could not schedule appointment.");
+  const handleBooking = async () => {
+    if (!selectedPet || !selectedDoctor || !selectedTime || !appointmentType || !selectedReason || (selectedReason === "Other" && !customReason.trim())) {
+      Alert.alert("Missing Fields", "Please complete all required fields.");
       return;
     }
 
-    Alert.alert("Appointment Confirmed", `${appointmentDetails.pet} - ${appointmentDetails.date} at ${appointmentDetails.time}`);
-    router.replace("/first");
-  } catch (error) {
-    console.error("Booking error:", error);
-    Alert.alert("Error", "Could not connect to the server.");
-  }
-};
+    const reasonToShow = selectedReason === "Other" ? customReason : selectedReason;
 
+    const appointmentDetails = {
+      pet: selectedPet.name,
+      doctor: selectedDoctor.name,
+      date: selectedDate,
+      time: selectedTime,
+      type: appointmentType,
+      reason: reasonToShow,
+    };
+
+    setIsBooking(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch(`${API_URL}/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(appointmentDetails),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert("Error", data.message || "Could not schedule appointment.");
+        setIsBooking(false);
+        return;
+      }
+
+      Alert.alert("Appointment Confirmed", `${appointmentDetails.pet} - ${appointmentDetails.date} at ${appointmentDetails.time}`);
+      setIsBooking(false);
+      router.replace("/first");
+    } catch (error) {
+      console.error("Booking error:", error);
+      setIsBooking(false);
+      Alert.alert("Error", "Could not connect to the server.");
+    }
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.headerRow}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={26} color="#333" />
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color="#1f2937" />
             </TouchableOpacity>
-            <Text style={styles.headerText}>Schedule Appointment</Text>
+            <Text style={styles.headerText}>Book Appointment</Text>
+            <View style={{ width: 40 }} />
           </View>
 
           {/* Pet Selection */}
-          <Text style={styles.heading}>Select Your Pet</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <Text style={styles.heading}>Select Your Pet Breed</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {dogBreeds.map((pet) => (
               <TouchableOpacity
                 key={pet.id}
-                style={[styles.doctorCard, selectedPet?.id === pet.id && styles.selectedDoc]}
+                style={[styles.cardItem, selectedPet?.id === pet.id && styles.selectedItem]}
                 onPress={() => setSelectedPet(pet)}
               >
-                <Image source={pet.image} style={styles.docImage} />
-                <Text style={styles.docName}>{pet.name}</Text>
+                <Image source={pet.image} style={styles.cardImage} />
+                <Text style={styles.cardName}>{pet.name}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
 
           {/* Doctor Selection */}
           <Text style={styles.heading}>Select Doctor</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {doctorData.map((doctor) => (
               <TouchableOpacity
                 key={doctor.id}
-                style={[styles.doctorCard, selectedDoctor?.id === doctor.id && styles.selectedDoc]}
+                style={[styles.cardItem, { width: 140 }, selectedDoctor?.id === doctor.id && styles.selectedItem]}
                 onPress={() => setSelectedDoctor(doctor)}
               >
-                <Image source={doctor.image} style={styles.docImage} />
-                <Text style={styles.docName}>{doctor.name}</Text>
-                <Text style={styles.docSpec}>{doctor.specialty}</Text>
+                <Image source={doctor.image} style={styles.cardImage} />
+                <Text style={styles.cardName}>{doctor.name}</Text>
+                <Text style={styles.cardSpec}>{doctor.specialty}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
 
           {/* Calendar */}
+          <Text style={styles.heading}>Select Date</Text>
           <Calendar
             current={selectedDate}
             onDayPress={(day) => {
@@ -144,22 +149,24 @@ export default function Appointment() {
             markedDates={{
               [selectedDate]: {
                 selected: true,
-                selectedColor: "#FF6B6B",
+                selectedColor: "#6d48ff",
                 selectedTextColor: "#fff",
               },
             }}
             style={styles.calendar}
             theme={{
-              arrowColor: "#9B59B6",
-              todayTextColor: "#9B59B6",
-              selectedDayBackgroundColor: "#FF6B6B",
+              arrowColor: "#6d48ff",
+              todayTextColor: "#6d48ff",
+              selectedDayBackgroundColor: "#6d48ff",
               selectedDayTextColor: "#fff",
-              monthTextColor: "#2D3436",
+              monthTextColor: "#1f2937",
+              textDayFontWeight: '500',
+              textMonthFontWeight: '700',
             }}
           />
 
           {/* Time Selection */}
-          <Text style={styles.heading}>Select Time</Text>
+          <Text style={styles.heading}>Select Time Slot</Text>
           <View style={styles.timeContainer}>
             {["10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM"].map((time, index) => (
               <TouchableOpacity
@@ -175,7 +182,7 @@ export default function Appointment() {
           {/* Appointment Type */}
           <Text style={styles.heading}>Appointment Type</Text>
           <View style={styles.typeContainer}>
-            {["At Home", "At Clinic", "Online", "Emergency"].map((type, index) => (
+            {["At Clinic", "At Home", "Online Consultation", "Emergency"].map((type, index) => (
               <TouchableOpacity
                 key={index}
                 style={[styles.typeBox, appointmentType === type && styles.selectedTypeBox]}
@@ -188,14 +195,14 @@ export default function Appointment() {
 
           {/* Reason to Visit */}
           <Text style={styles.heading}>Reason to Visit</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {reasons.map((reason, index) => (
               <TouchableOpacity
                 key={index}
                 style={[styles.typeBox, selectedReason === reason && styles.selectedTypeBox]}
                 onPress={() => {
                   setSelectedReason(reason);
-                  setCustomReason(""); // don't auto-fill input
+                  setCustomReason("");
                 }}
               >
                 <Text style={[styles.typeText, selectedReason === reason && styles.selectedTypeText]}>
@@ -207,7 +214,8 @@ export default function Appointment() {
 
           {selectedReason === "Other" && (
             <TextInput
-              placeholder="Enter reason here..."
+              placeholder="Please describe the reason..."
+              placeholderTextColor="#9ca3af"
               style={styles.customReasonInput}
               value={customReason}
               onChangeText={setCustomReason}
@@ -216,93 +224,126 @@ export default function Appointment() {
           )}
 
           {/* Book Button */}
-          <Pressable style={styles.bookButton} onPress={handleBooking}>
-            <Text style={styles.bookButtonText}>Book Now</Text>
-          </Pressable>
+          <TouchableOpacity style={styles.bookButton} onPress={handleBooking} disabled={isBooking}>
+            {isBooking ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.bookButtonText}>Book Appointment</Text>
+            )}
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} onPress={() => router.push("/first")}>
-          <Entypo name="home" size={24} color="#fff" />
+          <Entypo name="home" size={22} color="#fff" />
           <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => router.push("/appointment")}>
-          <Entypo name="calendar" size={24} color="#fff" />
+          <Entypo name="calendar" size={22} color="#fff" style={{ opacity: 0.9 }} />
           <Text style={styles.navLabel}>Appointment</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => router.push("/rescue")}>
-          <Ionicons name="paw-outline" size={24} color="#fff" />
+          <Ionicons name="paw-outline" size={22} color="#fff" />
           <Text style={styles.navLabel}>Rescue</Text>
         </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/appointmentRecords")}>
-  <Ionicons name="document-text-outline" size={24} color="#fff" />
-  <Text style={styles.navLabel}>Records</Text>
-</TouchableOpacity>
-
-        
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/appointmentRecords")}>
+          <Ionicons name="document-text-outline" size={22} color="#fff" />
+          <Text style={styles.navLabel}>Records</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: "#f9fafb",
+  },
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 140,
   },
   container: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
-    gap: 40,
+    justifyContent: "space-between",
+    marginBottom: 24,
+  },
+  backButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
   },
   headerText: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#2D3436",
+    fontWeight: "800",
+    color: "#1f2937",
   },
   heading: {
-    fontWeight: "bold",
-    color: "blue",
+    fontWeight: "700",
+    color: "#374151",
     fontSize: 16,
-    marginTop: 15,
-    marginBottom: 6,
+    marginTop: 20,
+    marginBottom: 12,
   },
-  doctorCard: {
-    backgroundColor: "#f1f1f1",
-    padding: 10,
-    borderRadius: 10,
+  horizontalScroll: {
+    paddingBottom: 10,
+  },
+  cardItem: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 16,
     alignItems: "center",
-    marginRight: 10,
-    width: 120,
+    marginRight: 12,
+    width: 110,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  selectedDoc: {
-    backgroundColor: "#c8e6c9",
+  selectedItem: {
+    borderColor: "#6d48ff",
+    borderWidth: 2,
+    backgroundColor: "#eff6ff",
   },
-  docImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 5,
+  cardImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    marginBottom: 8,
   },
-  docName: {
-    fontWeight: "bold",
+  cardName: {
+    fontWeight: "700",
     fontSize: 13,
+    color: "#1f2937",
     textAlign: "center",
   },
-  docSpec: {
+  cardSpec: {
     fontSize: 11,
+    color: "#6b7280",
     textAlign: "center",
+    marginTop: 2,
   },
   calendar: {
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 6,
+    elevation: 2,
   },
   timeContainer: {
     flexDirection: "row",
@@ -310,19 +351,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   timeBox: {
-    backgroundColor: "#e0e0ff",
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    borderRadius: 12,
     marginBottom: 10,
     width: "30%",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   selectedTimeBox: {
-    backgroundColor: "#FFA726",
+    backgroundColor: "#6d48ff",
+    borderColor: "#6d48ff",
   },
   timeText: {
-    color: "#333",
+    color: "#4b5563",
     fontWeight: "600",
     fontSize: 13,
   },
@@ -332,21 +375,24 @@ const styles = StyleSheet.create({
   typeContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 10,
+    marginBottom: 6,
   },
   typeBox: {
-    backgroundColor: "#ffe0e0",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     marginRight: 10,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   selectedTypeBox: {
-    backgroundColor: "#ff7675",
+    backgroundColor: "#6d48ff",
+    borderColor: "#6d48ff",
   },
   typeText: {
-    color: "#333",
+    color: "#4b5563",
     fontWeight: "600",
     fontSize: 13,
   },
@@ -354,39 +400,55 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   customReasonInput: {
-    borderColor: "#ccc",
+    borderColor: "#e5e7eb",
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 14,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    padding: 14,
+    fontSize: 15,
+    color: '#1f2937',
+    minHeight: 80,
+    textAlignVertical: 'top',
+    marginTop: 6,
     marginBottom: 20,
   },
   bookButton: {
-    backgroundColor: "#FFA726",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignSelf: "center",
-    marginTop: 10,
+    backgroundColor: "#6d48ff",
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
   bookButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "700",
   },
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "#6d48ff",
-    paddingVertical: 12,
+    paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 25,
     marginHorizontal: 20,
+    marginBottom: 20,
     position: "absolute",
-    bottom: 10,
+    bottom: 0,
     left: 0,
     right: 0,
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10,
   },
   navItem: {
     alignItems: "center",
@@ -394,6 +456,7 @@ const styles = StyleSheet.create({
   navLabel: {
     color: "#fff",
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: "500",
   },
 });
