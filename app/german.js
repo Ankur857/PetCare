@@ -1,97 +1,93 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 
 export default function GermanShepherd() {
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={36} color="#333" />
-      </TouchableOpacity>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#1f2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Breed Details</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-      {/* Dog Image */}
-      <Image
-        style={styles.img}
-        source={require("../assets/images/german.png")}
-      />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Dog Image Section */}
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.img}
+            source={require("../assets/images/german.png")}
+          />
+        </View>
 
-      {/* Scrollable Breed Info */}
-      <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.title}>German Shepherd</Text>
+        <Text style={styles.subtitle}>Confident, Courageous & Intelligent</Text>
 
-        <Text style={styles.sectionTitle}>🧬 Breed Overview</Text>
-        <Text style={styles.text}>
-          German Shepherds are confident, courageous, and smart. They are known
-          for their loyalty and protective nature. Originally bred for herding,
-          they are now used in police, military, and search & rescue roles.
-        </Text>
+        {/* Quick Stats badges */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Ionicons name="time-outline" size={20} color="#6d48ff" />
+            <Text style={styles.statVal}>9-13 yrs</Text>
+            <Text style={styles.statLabel}>Lifespan</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Ionicons name="fitness-outline" size={20} color="#10b981" />
+            <Text style={styles.statVal}>Very High</Text>
+            <Text style={styles.statLabel}>Activity</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Ionicons name="nutrition-outline" size={20} color="#f59e0b" />
+            <Text style={styles.statVal}>Protein Diet</Text>
+            <Text style={styles.statLabel}>Diet</Text>
+          </View>
+        </View>
 
-        <Text style={styles.sectionTitle}>🏋️‍♂️ Activity Level</Text>
-        <Text style={styles.text}>
-          Very high. They need daily exercise, mental stimulation, and
-          activities like running, obedience training, or agility courses.
-        </Text>
+        {/* Details Card */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>🧬 Breed Overview</Text>
+          <Text style={styles.text}>
+            German Shepherds are confident, courageous, and smart. They are known for their loyalty and protective nature. Originally bred for herding, they are now widely used in police, military, and search & rescue operations.
+          </Text>
 
-        <Text style={styles.sectionTitle}>🧠 Temperament</Text>
-        <Text style={styles.text}>
-          Intelligent, loyal, alert, and protective. They are quick learners and
-          very obedient when properly trained.
-        </Text>
+          <Text style={styles.sectionTitle}>🏋️‍♂️ Activity Level</Text>
+          <Text style={styles.text}>
+            Very high. They need daily exercise, mental stimulation, and structural training activities like running, tracking, and obedience courses.
+          </Text>
 
-        <Text style={styles.sectionTitle}>💊 Common Health Issues</Text>
-        <Text style={styles.text}>
-          - Hip & elbow dysplasia{"\n"}
-          - Degenerative myelopathy{"\n"}
-          - Allergies (skin issues){"\n"}
-          - Bloat (gastric torsion)
-        </Text>
+          <Text style={styles.sectionTitle}>🧠 Temperament</Text>
+          <Text style={styles.text}>
+            Intelligent, loyal, alert, and highly protective. They are incredibly quick learners and responsive to consistent training.
+          </Text>
 
-        <Text style={styles.sectionTitle}>📋 Symptoms to Watch For</Text>
-        <Text style={styles.text}>
-          - Lameness or stiffness (joint issues){"\n"}
-          - Excessive scratching or hair loss (allergies){"\n"}
-          - Weak hind legs (myelopathy){"\n"}
-          - Distended belly or drooling (bloat)
-        </Text>
+          <Text style={styles.sectionTitle}>💊 Common Health Issues</Text>
+          <Text style={styles.bulletText}>• Hip & elbow dysplasia</Text>
+          <Text style={styles.bulletText}>• Degenerative myelopathy</Text>
+          <Text style={styles.bulletText}>• Skin allergies and irritations</Text>
+          <Text style={styles.bulletText}>• Bloat (gastric torsion)</Text>
 
-        <Text style={styles.sectionTitle}>🎂 Life Span</Text>
-        <Text style={styles.text}>9 to 13 years with proper care.</Text>
+          <Text style={styles.sectionTitle}>📋 Symptoms to Watch For</Text>
+          <Text style={styles.bulletText}>• Lameness or stiffness during movement (joints)</Text>
+          <Text style={styles.bulletText}>• Excessive scratching or hair loss (skin concerns)</Text>
+          <Text style={styles.bulletText}>• Weakness in hind legs</Text>
+          <Text style={styles.bulletText}>• Distended belly or excessive drooling</Text>
 
-        <Text style={styles.sectionTitle}>🍗 Ideal Diet</Text>
-        <Text style={styles.text}>
-          High-protein, moderate-fat diet with joint supplements like glucosamine.
-          Avoid overfeeding and give fresh water always.
-        </Text>
+          <Text style={styles.sectionTitle}>🩺 Veterinary Tips</Text>
+          <Text style={styles.bulletText}>• Regular hip, joint, and spine assessments</Text>
+          <Text style={styles.bulletText}>• Keep ears clean and trim nails regularly</Text>
+          <Text style={styles.bulletText}>• Brush their thick coat twice a week</Text>
+          <Text style={styles.bulletText}>• Socialize them early to build confidence</Text>
 
-        <Text style={styles.sectionTitle}>🩺 Vet Tips</Text>
-        <Text style={styles.text}>
-          - Get regular hip and spine checkups{"\n"}
-          - Keep their ears clean and nails trimmed{"\n"}
-          - Brush their coat twice a week{"\n"}
-          - Socialize them early
-        </Text>
+          <Text style={styles.sectionTitle}>💡 Fun Fact</Text>
+          <Text style={styles.text}>
+            German Shepherds are the 2nd most popular dog breed in the world and are often featured in movies, TV shows, and space/military missions.
+          </Text>
 
-        <Text style={styles.sectionTitle}>💡 Fun Fact</Text>
-        <Text style={styles.text}>
-          German Shepherds are the 2nd most popular dog breed in the world and
-          are featured in many movies and military missions.
-        </Text>
-
-        <Text style={styles.footer}>🐾 Loyal Guardian & Loving Friend!</Text>
+          <Text style={styles.footer}>🐾 Loyal Guardian & Loving Friend!</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -100,53 +96,123 @@ export default function GermanShepherd() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f9fafb",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
     backgroundColor: "#fff",
   },
-  backBtn: {
-   position: "absolute",
-    top: 50,
-    left: 20,
-    zIndex: 10,
+  backButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: '#f3f4f6',
   },
-  img: {
-    width: hp(30),
-    height: hp(30),
-    marginTop: 50,
-    borderRadius: 10,
-    alignSelf: "center",
-    borderWidth: 8,
-    resizeMode: "cover",
-    borderColor: "#ccc",
-    backgroundColor: "black",
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1f2937",
   },
   scroll: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 40,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  img: {
+    width: "100%",
+    height: 220,
+    borderRadius: 24,
+    resizeMode: "cover",
   },
   title: {
     fontSize: 26,
-    fontWeight: "bold",
+    fontWeight: "900",
     textAlign: "center",
-    marginTop: 10,
-    color: "#333",
+    color: "#111827",
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#6b7280",
+    textAlign: "center",
+    marginTop: 4,
+    fontWeight: "600",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    marginBottom: 24,
+  },
+  statBox: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 12,
+    alignItems: "center",
+    width: "30%",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.01,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  statVal: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#1f2937",
+    marginTop: 6,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: "#9ca3af",
+    marginTop: 2,
+    fontWeight: "600",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.02,
+    shadowRadius: 10,
+    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#4B3F72",
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#6d48ff",
     marginTop: 20,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   text: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 14,
+    color: "#4b5563",
     lineHeight: 22,
   },
+  bulletText: {
+    fontSize: 14,
+    color: "#4b5563",
+    lineHeight: 22,
+    paddingLeft: 8,
+    marginBottom: 2,
+  },
   footer: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
-    marginTop: 30,
+    marginTop: 32,
     color: "#6d48ff",
-    fontWeight: "bold",
+    fontWeight: "800",
   },
 });

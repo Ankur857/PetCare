@@ -1,96 +1,94 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 
 export default function Pug() {
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Ionicons name="arrow-back" size={36} color="#333" />
-      </TouchableOpacity>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#1f2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Breed Details</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-      {/* Dog Image */}
-     <View style={styles.imageWrapper}>
-  <Image
-    style={styles.img}
-    source={require("../assets/images/pug.png")}
-  />
-</View>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Dog Image Section */}
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.img}
+            source={require("../assets/images/pug.png")}
+          />
+        </View>
 
-      {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.title}>Pug</Text>
+        <Text style={styles.subtitle}>Charming, Mischievous & Loving</Text>
 
-        <Text style={styles.sectionTitle}>🧬 Breed Overview</Text>
-        <Text style={styles.text}>
-          Pugs are charming, mischievous, and loving little dogs. Known for their wrinkled face and curly tail, they are excellent companion pets with a great sense of humor.
-        </Text>
+        {/* Quick Stats badges */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Ionicons name="time-outline" size={20} color="#6d48ff" />
+            <Text style={styles.statVal}>12-15 yrs</Text>
+            <Text style={styles.statLabel}>Lifespan</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Ionicons name="fitness-outline" size={20} color="#10b981" />
+            <Text style={styles.statVal}>Moderate</Text>
+            <Text style={styles.statLabel}>Activity</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Ionicons name="nutrition-outline" size={20} color="#f59e0b" />
+            <Text style={styles.statVal}>Low Fat</Text>
+            <Text style={styles.statLabel}>Diet</Text>
+          </View>
+        </View>
 
-        <Text style={styles.sectionTitle}>🏋️‍♂️ Activity Level</Text>
-        <Text style={styles.text}>
-          Moderate. Pugs enjoy short walks and playtime but should not be over-exercised, especially in heat due to breathing issues.
-        </Text>
+        {/* Details Card */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>🧬 Breed Overview</Text>
+          <Text style={styles.text}>
+            Pugs are charming, mischievous, and loving little dogs. Known for their wrinkled faces and curly tails, they are excellent companion pets with a great sense of humor and personality.
+          </Text>
 
-        <Text style={styles.sectionTitle}>🧠 Temperament</Text>
-        <Text style={styles.text}>
-          Affectionate, playful, and great with kids. Pugs are people-oriented and love cuddling and human interaction.
-        </Text>
+          <Text style={styles.sectionTitle}>🏋️‍♂️ Activity Level</Text>
+          <Text style={styles.text}>
+            Moderate. Pugs enjoy short walks and playtime but should not be over-exercised, especially in hot or humid weather due to potential breathing issues.
+          </Text>
 
-        <Text style={styles.sectionTitle}>💊 Common Health Issues</Text>
-        <Text style={styles.text}>
-          - Brachycephalic syndrome (breathing difficulty){"\n"}
-          - Obesity{"\n"}
-          - Eye conditions (dry eye, ulcers){"\n"}
-          - Hip dysplasia{"\n"}
-          - Skin infections in wrinkles
-        </Text>
+          <Text style={styles.sectionTitle}>🧠 Temperament</Text>
+          <Text style={styles.text}>
+            Affectionate, playful, and great with kids. Pugs are people-oriented, love cuddling, and thrive on human interaction and companionship.
+          </Text>
 
-        <Text style={styles.sectionTitle}>📋 Symptoms to Watch For</Text>
-        <Text style={styles.text}>
-          - Snorting or labored breathing{"\n"}
-          - Eye redness, squinting, or discharge{"\n"}
-          - Itching or odor in skin folds{"\n"}
-          - Overeating or lethargy
-        </Text>
+          <Text style={styles.sectionTitle}>💊 Common Health Issues</Text>
+          <Text style={styles.bulletText}>• Brachycephalic syndrome (breathing difficulty)</Text>
+          <Text style={styles.bulletText}>• Obesity (prone to weight gain)</Text>
+          <Text style={styles.bulletText}>• Eye conditions (dry eye, ulcers)</Text>
+          <Text style={styles.bulletText}>• Hip dysplasia</Text>
+          <Text style={styles.bulletText}>• Skin fold infections</Text>
 
-        <Text style={styles.sectionTitle}>🎂 Life Span</Text>
-        <Text style={styles.text}>
-          12 to 15 years with proper care, a good diet, and weight management.
-        </Text>
+          <Text style={styles.sectionTitle}>📋 Symptoms to Watch For</Text>
+          <Text style={styles.bulletText}>• Snorting, snoring, or labored breathing</Text>
+          <Text style={styles.bulletText}>• Eye redness, squinting, or discharge</Text>
+          <Text style={styles.bulletText}>• Itching or unpleasant odor in skin folds</Text>
+          <Text style={styles.bulletText}>• Overeating or severe lethargy</Text>
 
-        <Text style={styles.sectionTitle}>🍗 Ideal Diet</Text>
-        <Text style={styles.text}>
-          Low-fat, high-quality kibble. Pugs are prone to weight gain, so portion control is essential. Avoid table scraps.
-        </Text>
+          <Text style={styles.sectionTitle}>🩺 Veterinary Tips</Text>
+          <Text style={styles.bulletText}>• Clean facial wrinkles daily with a damp cloth</Text>
+          <Text style={styles.bulletText}>• Avoid extreme heat and humidity</Text>
+          <Text style={styles.bulletText}>• Schedule annual dental cleanings</Text>
+          <Text style={styles.bulletText}>• Perform regular eye checkups</Text>
 
-        <Text style={styles.sectionTitle}>🩺 Vet Tips</Text>
-        <Text style={styles.text}>
-          - Clean facial wrinkles daily{"\n"}
-          - Avoid extreme heat and humidity{"\n"}
-          - Annual dental cleaning{"\n"}
-          - Regular eye checkups
-        </Text>
+          <Text style={styles.sectionTitle}>💡 Fun Fact</Text>
+          <Text style={styles.text}>
+            Pugs were once the prized companions of Chinese emperors and later became very popular among European royalty, including Queen Victoria.
+          </Text>
 
-        <Text style={styles.sectionTitle}>💡 Fun Fact</Text>
-        <Text style={styles.text}>
-          Pugs were once the companions of Chinese emperors and later became popular among European royalty.
-        </Text>
-
-        <Text style={styles.footer}>🐾 Tiny Body, Huge Heart!</Text>
+          <Text style={styles.footer}>🐾 Tiny Body, Huge Heart!</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -99,60 +97,123 @@ export default function Pug() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f9fafb",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
     backgroundColor: "#fff",
   },
-  backBtn: {
-     position: "absolute",
-    top: 50,
-    left: 20,
-    zIndex: 10,
+  backButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: '#f3f4f6',
   },
-  imageWrapper: {
-  width: hp(30),
-  height: hp(30),
-  alignSelf: "center",
-  marginTop: 50,
-  borderRadius: 10,
-  overflow: "hidden",
-  borderWidth: 8,
-  borderColor: "#ccc",
-  backgroundColor: "#000",
-},
-
-img: {
-  width: "85%",
-  height: "100%",
-  resizeMode: "cover",
-},
-
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1f2937",
+  },
   scroll: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 40,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  img: {
+    width: "100%",
+    height: 220,
+    borderRadius: 24,
+    resizeMode: "cover",
   },
   title: {
     fontSize: 26,
-    fontWeight: "bold",
+    fontWeight: "900",
     textAlign: "center",
-    marginTop: 10,
-    color: "#333",
+    color: "#111827",
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#6b7280",
+    textAlign: "center",
+    marginTop: 4,
+    fontWeight: "600",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    marginBottom: 24,
+  },
+  statBox: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 12,
+    alignItems: "center",
+    width: "30%",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.01,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  statVal: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#1f2937",
+    marginTop: 6,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: "#9ca3af",
+    marginTop: 2,
+    fontWeight: "600",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.02,
+    shadowRadius: 10,
+    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#4B3F72",
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#6d48ff",
     marginTop: 20,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   text: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 14,
+    color: "#4b5563",
     lineHeight: 22,
   },
+  bulletText: {
+    fontSize: 14,
+    color: "#4b5563",
+    lineHeight: 22,
+    paddingLeft: 8,
+    marginBottom: 2,
+  },
   footer: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
-    marginTop: 30,
+    marginTop: 32,
     color: "#6d48ff",
-    fontWeight: "bold",
+    fontWeight: "800",
   },
 });

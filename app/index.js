@@ -1,12 +1,9 @@
 import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Dimensions, Image, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export const options = {
-  headerShown: false,
-};
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { height, width } = Dimensions.get("window");
 
@@ -25,75 +22,123 @@ export default function Index() {
     };
     checkLogin();
   }, []);
-  return (
-    <ImageBackground
-      source={require("../assets/images/vetclinic_02.jpg")}
-      style={styles.background}
-      imageStyle={{ opacity: 0.1 }}
-    >
-      <View style={styles.container}>
-        <Image source={require("../assets/images/image.png")} style={styles.logo} />
-        <Text style={styles.title}>Welcome to PetCare</Text>
-        <Text style={styles.subtitle}>Your trusted partner in pet health and happiness</Text>
 
-        <LinearGradient
-          colors={["#6d48ff", "#8e44ad"]}
-          style={styles.getStartedBtn}
-        >
-          <Pressable onPress={() => router.push("/login")}>
-            <Text style={styles.getStartedText}>Get Started</Text>
-          </Pressable>
-        </LinearGradient>
-      </View>
-    </ImageBackground>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <LinearGradient
+        colors={["#f0f4ff", "#e0e7ff", "#c7d2fe"]}
+        style={styles.gradientContainer}
+      >
+        <View style={styles.container}>
+          {/* Paw illustration background icon/pattern mock */}
+          <View style={styles.pawBackdrop}>
+            <Image
+              source={require("../assets/images/image.png")}
+              style={styles.logo}
+            />
+          </View>
+
+          <Text style={styles.title}>PetCare</Text>
+          <Text style={styles.subtitle}>
+            Your reliable companion for veterinary care, dog adoption insights, and quick animal rescue reporting.
+          </Text>
+
+          <View style={styles.buttonContainer}>
+            <LinearGradient
+              colors={["#6d48ff", "#8e44ad"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.getStartedBtn}
+            >
+              <Pressable
+                onPress={() => router.push("/login")}
+                style={({ pressed }) => [
+                  styles.pressable,
+                  pressed && { opacity: 0.95 }
+                ]}
+              >
+                <Text style={styles.getStartedText}>Get Started</Text>
+              </Pressable>
+            </LinearGradient>
+          </View>
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#f0f4ff",
+  },
+  gradientContainer: {
+    flex: 1,
   },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 30,
+    paddingHorizontal: 32,
+  },
+  pawBackdrop: {
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 40,
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 6,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 150,
+    height: 150,
     resizeMode: "contain",
-    marginBottom: 40,
   },
   title: {
-    fontSize: 34,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 40,
+    fontWeight: "900",
+    color: "#1f2937",
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 17,
-    color: "#666",
+    fontSize: 16,
+    color: "#4b5563",
     textAlign: "center",
-    marginBottom: 60,
+    marginBottom: 64,
     lineHeight: 24,
+    paddingHorizontal: 12,
+  },
+  buttonContainer: {
+    width: "100%",
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#6d48ff",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 6,
   },
   getStartedBtn: {
     width: "100%",
-    paddingVertical: 18,
     borderRadius: 20,
+  },
+  pressable: {
+    paddingVertical: 18,
+    width: "100%",
     alignItems: "center",
-    shadowColor: "#6d48ff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 6,
+    justifyContent: "center",
   },
   getStartedText: {
     color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "800",
   },
 });
